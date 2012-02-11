@@ -1,0 +1,9 @@
+﻿<Window x:Class="KinectSample.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="764" Loaded="Window_Loaded" Closing="Window_Closing" xmlns:my="clr-namespace:Microsoft.Samples.Kinect.WpfViewers;assembly=Microsoft.Samples.Kinect.WpfViewers">
+    <Grid>
+        <my:KinectSensorChooser HorizontalAlignment="Left" Name="kinectSensorChooser" VerticalAlignment="Top" Width="328" Margin="228,65,0,0" />
+        <Image Height="240" HorizontalAlignment="Left" Margin="30,31,0,0" Name="colorImage" Stretch="Fill" VerticalAlignment="Top" Width="320" />
+    </Grid>
+</Window>
