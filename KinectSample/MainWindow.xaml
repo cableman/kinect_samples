@@ -1,9 +1,12 @@
 ﻿<Window x:Class="KinectSample.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="764" Loaded="Window_Loaded" Closing="Window_Closing" xmlns:my="clr-namespace:Microsoft.Samples.Kinect.WpfViewers;assembly=Microsoft.Samples.Kinect.WpfViewers">
+        Title="Kinect Sample (Test)" Height="412" Width="805" Loaded="Window_Loaded" Closing="Window_Closing" xmlns:my="clr-namespace:Microsoft.Samples.Kinect.WpfViewers;assembly=Microsoft.Samples.Kinect.WpfViewers" Background="#FF323232" Foreground="White">
     <Grid>
         <my:KinectSensorChooser HorizontalAlignment="Left" Name="kinectSensorChooser" VerticalAlignment="Top" Width="328" Margin="228,65,0,0" />
         <Image Height="240" HorizontalAlignment="Left" Margin="30,31,0,0" Name="colorImage" Stretch="Fill" VerticalAlignment="Top" Width="320" />
+        <Slider Height="92" HorizontalAlignment="Left" Margin="739,89,0,0" Name="slider1" VerticalAlignment="Top" Width="26" Orientation="Vertical" Maximum="27" Minimum="-27" PreviewMouseLeftButtonUp="slider1_PreviewMouseLeftButtonUp" />
+        <Label Content="10" Height="28" HorizontalAlignment="Left" Margin="738,187,0,0" Name="lblCurrentAngle" VerticalAlignment="Top" Foreground="White" />
+        <Image Height="240" HorizontalAlignment="Left" Margin="383,30,0,0" Name="depthImage" Stretch="Fill" VerticalAlignment="Top" Width="320" />
     </Grid>
 </Window>
