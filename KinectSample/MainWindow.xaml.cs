@@ -256,33 +256,24 @@ namespace KinectSample
 
             // Create array to hold depth mapping data.
             ColorImagePoint[] _mappedDepthLocations = new ColorImagePoint[depthFrame.PixelDataLength];
-
+            kinectSensorChooser.Kinect.MapDepthFrameToColorFrame(DepthImageFormat.Resolution640x480Fps30, rawDepthData, ColorImageFormat.RgbResolution640x480Fps30, _mappedDepthLocations);
+                
             // Each index in depth array is equal to 4 pixels in color array (B, G, R, A)
-            for (int depthIndex = 0, colorIndex = 0, x = 0;
+            for (int depthIndex = 0, colorIndex = 0;
                 depthIndex < rawDepthData.Length && colorIndex < colorPixels.Length;
                 depthIndex++, colorIndex += 4)
             {
-                if (depthIndex % depthFrame.Width == 0)
-                {
-                    x++;
-                }
-
                 // Get the player (requires skeleton tracking enabled for values)
                 int player = rawDepthData[depthIndex] & DepthImageFrame.PlayerIndexBitmask;
-                if (player <= 0)
+                if (player > 0)
                 {
                     // Not a player
-                    int y = (x * depthFrame.Width) - depthIndex;
-                    ColorImagePoint point = depthFrame.MapToColorImagePoint(x, y, ColorImageFormat.RgbResolution640x480Fps30);
-
-                    colorPixels[colorIndex + BlueIndex] = 0;
-                    colorPixels[colorIndex + GreenIndex] = 0;
-                    colorPixels[colorIndex + RedIndex] = 0;//(byte)((colorPixels[colorIndex] + 255) >> 1);
-                    colorPixels[colorIndex + AlphaIndex] = 0;
-                }
-                else
-                {
-                    colorPixels[colorIndex + AlphaIndex] = 255;
+                    ColorImagePoint point = _mappedDepthLocations[depthIndex];
+                    if ((point.X >= 0 && point.X < colorFrame.Width) && (point.Y >= 0 && point.Y < colorFrame.Height))
+                    {
+                        int baseIndex = (point.Y * colorFrame.Width + point.X) * 4;
+                        colorPixels[baseIndex + AlphaIndex] = 255;
+                    }                    
                 }
             }
 
