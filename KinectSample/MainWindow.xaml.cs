@@ -65,7 +65,8 @@ namespace KinectSample
         private void newSensort_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
             kinectUpdateColorImage(e.OpenColorImageFrame());
-            kinectUpdateDepthImage(e.OpenDepthImageFrame());            
+            kinectUpdateDepthImage(e.OpenDepthImageFrame());
+            kinectPlayerImage(e.OpenColorImageFrame(), e.OpenDepthImageFrame());
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -233,5 +234,62 @@ namespace KinectSample
             slider1.IsEnabled = true;
         }
         #endregion
+
+        private static WriteableBitmap playerBitmap = new WriteableBitmap(640, 480, 96, 96, PixelFormats.Bgra32, null);
+        private void kinectPlayerImage(ColorImageFrame colorFrame, DepthImageFrame depthFrame)
+        {
+            if (colorFrame == null || depthFrame == null) { return;  }
+
+            // Image color index
+            const int BlueIndex = 0;
+            const int GreenIndex = 1;
+            const int RedIndex = 2;
+            const int AlphaIndex = 3;
+
+            // Get color image
+            byte[] colorPixels = new Byte[colorFrame.PixelDataLength];
+            colorFrame.CopyPixelDataTo(colorPixels);
+
+            // Get depth image
+            short[] rawDepthData = new short[depthFrame.PixelDataLength];
+            depthFrame.CopyPixelDataTo(rawDepthData);
+
+            // Create array to hold depth mapping data.
+            ColorImagePoint[] _mappedDepthLocations = new ColorImagePoint[depthFrame.PixelDataLength];
+
+            // Each index in depth array is equal to 4 pixels in color array (B, G, R, A)
+            for (int depthIndex = 0, colorIndex = 0, x = 0;
+                depthIndex < rawDepthData.Length && colorIndex < colorPixels.Length;
+                depthIndex++, colorIndex += 4)
+            {
+                if (depthIndex % depthFrame.Width == 0)
+                {
+                    x++;
+                }
+
+                // Get the player (requires skeleton tracking enabled for values)
+                int player = rawDepthData[depthIndex] & DepthImageFrame.PlayerIndexBitmask;
+                if (player <= 0)
+                {
+                    // Not a player
+                    int y = (x * depthFrame.Width) - depthIndex;
+                    ColorImagePoint point = depthFrame.MapToColorImagePoint(x, y, ColorImageFormat.RgbResolution640x480Fps30);
+
+                    colorPixels[colorIndex + BlueIndex] = 0;
+                    colorPixels[colorIndex + GreenIndex] = 0;
+                    colorPixels[colorIndex + RedIndex] = 0;//(byte)((colorPixels[colorIndex] + 255) >> 1);
+                    colorPixels[colorIndex + AlphaIndex] = 0;
+                }
+                else
+                {
+                    colorPixels[colorIndex + AlphaIndex] = 255;
+                }
+            }
+
+            // Update the image
+            int stride = colorFrame.Width * 4; // (B,G,R,Empty)
+            playerBitmap.WritePixels(new Int32Rect(0, 0, playerBitmap.PixelWidth, playerBitmap.PixelHeight), colorPixels, stride, 0);
+            playerImage.Source = playerBitmap;
+        }
     }
 }
